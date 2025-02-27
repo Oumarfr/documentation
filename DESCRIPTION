@@ -1,0 +1,23 @@
+Package: documentation
+Title: Package Sur Analyse De T Test
+Version: 0.0.0.9000
+Authors@R: 
+    person("Oumar", "Barry", , "alphadjobarry999@gmail.com", role = c("aut", "cre"))
+Description: Package contenant différentes fonctions utiles pour l'analyse
+    de T Test.
+License: MIT + file LICENSE
+Imports: 
+    ggplot2,
+    pwr,
+    stats,
+    utils
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
+Config/fusen/version: 0.7.1
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1

@@ -1,0 +1,157 @@
+---
+title: "Fonctions T Test"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+
+
+```{r development-load}
+# Load already included functions if relevant
+pkgload::load_all(export_all = FALSE)
+```
+
+# Fonction bio_analyze_t_test()
+
+Une grande fonction  regroupant différentes fonctionnalités qui :
+
+1. Génère les données
+2. Effectue le test t
+3. Calcule la puissance statistique
+4. Interprète les résultats
+5. Génère un graphique
+    
+```{r development-bio_analyze_t_test}
+# You can prepare the code of the bio_analyze_t_test() function here
+```
+  
+```{r function-bio_analyze_t_test}
+#' Analyse compl<c3><a8>te d'un T-Test
+#'
+#' @name bio_analyze_t_test
+#'
+#' @param n1 Taille de l'<c3><a9>chantillon du premier groupe
+#' @param mean1 Moyenne du premier groupe
+#' @param sd1 <c3><89>cart-type du premier groupe
+#' @param n2 Taille de l'<c3><a9>chantillon du deuxi<c3><a8>me groupe
+#' @param mean2 Moyenne du deuxi<c3><a8>me groupe
+#' @param sd2 <c3><89>cart-type du deuxi<c3><a8>me groupe
+#' @param test_type Type de test (two.sample.classique, two.sample.Welch, paired, one.sample)
+#' @param alpha Niveau de signification (ex: 0.05)
+#' @param alternative Hypoth<c3><a8>se alternative ("two.sided", "greater", "less")
+#' 
+#' @importFrom stats rnorm t.test qt
+#' @importFrom pwr pwr.t2n.test
+#'@importFrom ggplot2 ggplot aes geom_histogram geom_line geom_vline labs theme_minimal scale_fill_manual
+#'@importFrom utils read.csv write.csv
+#'
+#' @export
+#'  
+#' @return Une liste contenant les r<c3><a9>sultats du test, la puissance et le graphique
+#' 
+#' 
+#' @examples
+#' bio_analyze_t_test(n1 = 30, mean1 = 70, sd1 = 10, n2 = 30, mean2 = 75, sd2 = 10, 
+#'                test_type = "two.sample.classique", alpha = 0.05, alternative = "two.sided")
+#'
+
+utils::globalVariables(c("valeur", "..density.."))
+
+
+bio_analyze_t_test <- function(n1, mean1, sd1, n2, mean2, sd2, 
+                           test_type, alpha = 0.05, alternative = "two.sided") {
+  
+  # 1<ef><b8><8f><e2><83><a3> G<c3><a9>n<c3><a9>ration des donn<c3><a9>es
+  data1 <- rnorm(n1, mean = mean1, sd = sd1)
+  data2 <- if (test_type == "two.sample.Welch" || test_type == "paired") {
+    rnorm(n2, mean = mean2, sd = sd2)
+  } else {
+    rnorm(n2, mean = mean2, sd = sd1)
+  }
+  
+  # 2<ef><b8><8f><e2><83><a3> Ex<c3><a9>cution du test t
+  if (test_type == "two.sample.classique") {
+    t_test <- t.test(data1, data2, var.equal = TRUE, alternative = alternative)
+  } else if (test_type == "two.sample.Welch") {
+    t_test <- t.test(data1, data2, var.equal = FALSE, alternative = alternative)
+  } else if (test_type == "paired") {
+    t_test <- t.test(data1, data2, paired = TRUE, alternative = alternative)
+  } else if (test_type == "one.sample") {
+    t_test <- t.test(data1, mu = mean2, alternative = alternative)
+  } else {
+    stop("Type de test non valide")
+  }
+  
+  # 3<ef><b8><8f><e2><83><a3> Calcul de la puissance statistique
+  pooled_sd <- sqrt(((sd1^2) / n1) + ((sd2^2) / n2))
+  effect_size <- abs(mean1 - mean2) / pooled_sd
+  powerres <- pwr::pwr.t2n.test(n1 = n1, n2 = n2, d = effect_size, 
+                                sig.level = alpha, alternative = alternative)
+  power <- powerres$power
+  
+  # 4<ef><b8><8f><e2><83><a3> Interpr<c3><a9>tation des r<c3><a9>sultats
+  interpretation <- if (t_test$p.value < alpha) {
+    "Le test est significatif : nous rejetons H0."
+  } else {
+    "Le test n'est pas significatif : nous ne rejetons pas H0."
+  }
+  
+  # 5<ef><b8><8f><e2><83><a3> G<c3><a9>n<c3><a9>ration du graphique
+  df1 <- data.frame(valeur = data1, groupe = "Groupe 1")
+  df2 <- data.frame(valeur = data2, groupe = "Groupe 2")
+  
+  plot <- ggplot2::ggplot() +
+    ggplot2::geom_histogram(data = df1, aes(x = valeur, y = ..density..), 
+                            fill = "blue", alpha = 0.6, bins = 20) +
+    ggplot2::geom_histogram(data = df2, aes(x = valeur, y = ..density..), 
+                            fill = "green", alpha = 0.6, bins = 20) +
+    ggplot2::geom_vline(xintercept = mean(data1), color = "blue", linetype = "dashed") +
+    ggplot2::geom_vline(xintercept = mean(data2), color = "green", linetype = "dashed") +
+    ggplot2::theme_minimal() +
+    ggplot2::labs(title = "Comparaison des deux groupes", x = "Valeurs", y = "Densit<c3><a9>")
+  
+  # Retourner les r<c3><a9>sultats sous forme de liste
+  return(list(
+    t_test = t_test,
+    power = power,
+    interpretation = interpretation,
+    plot = plot
+  ))
+}
+```
+  
+```{r example-bio_analyze_t_test}
+bio_analyze_t_test(n1 = 30, mean1 = 70, sd1 = 10, 
+               n2 = 30, mean2 = 75, sd2 = 10, 
+               test_type = "two.sample.classique", 
+               alpha = 0.05, alternative = "two.sided")
+```
+  
+```{r tests-bio_analyze_t_test}
+test_that("bio_analyze_t_test works", {
+  result <- bio_analyze_t_test(n1 = 30, mean1 = 70, sd1 = 10, 
+                           n2 = 30, mean2 = 75, sd2 = 10, 
+                           test_type = "two.sample.classique", 
+                           alpha = 0.05, alternative = "two.sided")
+  
+  expect_s3_class(result$t_test, "htest")
+  expect_true("p.value" %in% names(result$t_test))
+  expect_true("statistic" %in% names(result$t_test))
+  expect_type(result$power, "double")
+  expect_true(result$power > 0 & result$power <= 1)
+  expect_s3_class(result$plot, "gg")
+})
+```
+  
+  
+
+```{r development-inflate, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(flat_file = "dev/flat_TTest.Rmd", vignette_name = "Fonctions T Test")
+```

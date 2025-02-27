@@ -1,0 +1,15 @@
+flat_TTest.Rmd:
+  path: dev/flat_TTest.Rmd
+  state: active
+  R: R/bio_analyze_t_test.R
+  tests: tests/testthat/test-bio_analyze_t_test.R
+  vignettes: vignettes/fonctions-t-test.Rmd
+  inflate:
+    flat_file: dev/flat_TTest.Rmd
+    vignette_name: Fonctions T Test
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+    clean: ask
+    codecov: false

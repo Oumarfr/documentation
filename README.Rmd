@@ -1,0 +1,95 @@
+---
+output: github_document
+---
+
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# documentation_T_test_Bio
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+📌 Description
+
+Le package documentation_T_test_Bio permet d'effectuer des tests de Student (T-Test) sur des échantillons simulés ou réels. Il prend en charge plusieurs types de tests :
+
+Test à un échantillon
+Test pour deux échantillons classiques
+Test de Welch (variances inégales)
+Test apparié
+Il fournit également :
+
+L'interprétation automatique des résultats
+La puissance statistique du test
+Des visualisations graphiques des distributions
+
+🚀 Installation
+
+Vous pouvez installer la version de développement directement depuis GitHub :
+
+
+``` {r  }
+# Installer le package depuis GitHub
+# install.packages("devtools")
+devtools::install_github("Oumarfr/documentation")
+```
+
+Puis, chargez le package :
+
+```{r }
+library(documentation)
+
+```
+
+🛠️ Utilisation
+
+Voici un exemple simple de test de Student classique à deux échantillons :
+
+```{r  }
+library(documentation)
+
+# Exécuter un test T classique
+result <- bio_analyze_t_test(n1 = 30, mean1 = 70, sd1 = 10, 
+                             n2 = 30, mean2 = 75, sd2 = 10, 
+                             test_type = "two.sample.classique", 
+                             alpha = 0.05, alternative = "two.sided")
+
+# Afficher les résultats
+print(result$t_test)
+print(result$interpretation)
+
+```
+
+📊 Visualisation
+
+```{r , echo=FALSE}
+result$plot
+
+```
+
+📖 Documentation
+
+Pour plus d'informations, consultez la documentation complète via :
+```{r }
+help("bio_analyze_t_test")
+
+```
+
+Ou visitez la vignette associée :
+```{r }
+vignette("fonctions-t-test", package = "documentation")
+
+```
+
+🔗 Auteur
+
+Développé par Oumar Ibrahim Barry.

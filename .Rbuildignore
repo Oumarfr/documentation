@@ -2,3 +2,4 @@
 ^LICENSE\.md$
 ^documentation\.Rproj$
 ^\.Rproj\.user$
+^README\.Rmd$
